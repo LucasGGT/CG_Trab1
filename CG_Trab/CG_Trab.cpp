@@ -4,7 +4,6 @@
 //using vertice = std::pair<double, double>;
 //using lista_vertices = std::vector<vertice>;
 using aresta = std::pair<int, int>;
-using lista_arestas = std::vector<aresta>;
 
 struct vertice {
 	double x, y, z;
@@ -18,10 +17,10 @@ struct Poligono {
 	double rotacao;
 	double matriz_rotacao[3][3];
 	std::vector<vertice> vertices;
-	lista_arestas arestas;
+	std::vector<aresta> arestas;
 };
 
-Poligono criar_poligono(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados);
+Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados);
 void desenhar(Poligono poligono);
 void movimentar(Poligono& poligono, double distancia, double angulo);
 void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z);
@@ -34,12 +33,12 @@ void keyboard(unsigned char key, int x, int y);
 void keyboard_special(int key, int x, int y);
 void reshape(GLsizei width, GLsizei height);
 
-Poligono pentagono;
+Poligono cubo;
 int delay = 10;
 
 int main(int argc, char** argv) {
 
-	pentagono = criar_poligono(128, 128, 5, 50, 6);
+	cubo = criar_cubo(128, 128, 5, 50, 24);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE); // Double buffer
@@ -70,7 +69,7 @@ int main(int argc, char** argv) {
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	desenhar(pentagono);
+	desenhar(cubo);
 
 	glFlush();
 }
@@ -82,7 +81,7 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0);
 		break;
 	case ' ':
-		escalar(pentagono, 0.1, 0.1, 0.1);
+		escalar(cubo, 0.1, 0.1, 0.1);
 		break;
 	}
 }
@@ -91,19 +90,19 @@ void keyboard_special(int key, int x, int y) {
 	std::cout << key;
 	switch (key) {
 	case GLUT_KEY_DOWN:
-		movimentar(pentagono, 10, (270 / 180.0) * 3.1416);
+		movimentar(cubo, 10, (270 / 180.0) * 3.1416);
 		break;
 
 	case GLUT_KEY_UP:
-		movimentar(pentagono, 10, (90 / 180.0) * 3.1416);
+		movimentar(cubo, 10, (90 / 180.0) * 3.1416);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		movimentar(pentagono, 10, (0 / 180.0) * 3.1416);
+		movimentar(cubo, 10, (0 / 180.0) * 3.1416);
 		break;
 
 	case GLUT_KEY_LEFT:
-		movimentar(pentagono, 10, (180 / 180.0) * 3.1416);
+		movimentar(cubo, 10, (180 / 180.0) * 3.1416);
 		break;
 
 	}
@@ -131,7 +130,7 @@ vertice criar_vertice(double pos_x, double pos_y, double pos_z) {
 	return novo_v;
 }
 
-Poligono criar_poligono(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados) {
+Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados) {
 	Poligono novo_poligono;
 	novo_poligono.numLados = num_lados;
 	novo_poligono.posicao.x = posicao_x;
@@ -144,24 +143,47 @@ Poligono criar_poligono(double posicao_x, double posicao_y, double posicao_z, do
 	novo_poligono.escala.z = 1;
 
 	novo_poligono.rotacao = 0;
+	
 
-	float angulo = 0;
-	float passo_angulo = ((360 / float(num_lados)) * 3.1416) / 180.0;
+	// Face de cima (y = 1.0f)
+	// Define os vértice em ordem anti-horário com a face apontando para cima
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
+	// Face de cima (y = -1.0f)
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -1.0f));
 
-	float apothem = tamanho_lado / (2 * tan(3.1416 / float(num_lados)));
-	posicao_x -= tamanho_lado / 2.0;
-	posicao_y -= apothem;
+	// Face da frente  (z = 1.0f)
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, 1.0f));
 
-	novo_poligono.vertices.push_back(criar_vertice(posicao_x, posicao_y, posicao_z));
+	// Face de trás (z = -1.0f)
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
+
+	// Face esquerda (x = -1.0f)
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, 1.0f));
+
+	// Face direita (x = 1.0f)
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -1.0f));
+
 	std::cout << "Vertices:\n";
-	std::cout << 0 << " - " << posicao_x << " - " << posicao_y << " - " << posicao_z << "\n";
-	for (int i = 1; i < num_lados; i++) {
-		posicao_x = posicao_x + tamanho_lado * cos(angulo);
-		posicao_y = posicao_y + tamanho_lado * sin(angulo);
-		posicao_z = posicao_z + tamanho_lado * cos(angulo);
-		novo_poligono.vertices.push_back(criar_vertice(posicao_x, posicao_y, posicao_z));
-		std::cout << i << " - " << posicao_x << " - " << posicao_y << " - " << posicao_z << "\n";
-		angulo += passo_angulo;
+	for (int i = 0; i < novo_poligono.vertices.size() ; i++) {
+		std::cout << i << "-| " << novo_poligono.vertices[i].x << " | " << novo_poligono.vertices[i].y << " | " << novo_poligono.vertices[i].z << "\n";
 	}
 
 	std::cout << "Arestas:\n";
@@ -169,7 +191,6 @@ Poligono criar_poligono(double posicao_x, double posicao_y, double posicao_z, do
 		novo_poligono.arestas.push_back(aresta(i, (i + 1) % num_lados));
 		std::cout << i << " - " << (i + 1) % num_lados << "\n";
 	}
-
 
 	return novo_poligono;
 }
@@ -239,89 +260,20 @@ void desenhar(Poligono poligono) {
 
 	// Renderiza um cubo com 6 quads diferentes
 	glLoadIdentity();                 // Reseta para a matriz identidade
-	glTranslatef(1.5f, 0.0f, -7.0f);  // Move para a direta da view o que será desenhado
+	glTranslatef(0.0f, 0.0f, -7.0f);  // Move para a direta da view o que será desenhado
 
-	glBegin(GL_QUADS);                // Começa a desenhar o cubo
-	   // Face de cima (y = 1.0f)
-	   // Define os vértice em ordem anti-horário com a face apontando para cima
-	glColor3f(0.0f, 1.0f, 0.0f);     // Verde
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
+	glRotatef(30, 1, 1, 0);//Só para teste
+	std::cout << "\nTeste:\n";
 
-	// Face de cima (y = -1.0f)
-	glColor3f(1.0f, 0.5f, 0.0f);     // Laranja
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-
-	// Face da frente  (z = 1.0f)
-	glColor3f(1.0f, 0.0f, 0.0f);     // Vermelho
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-
-	// Face de trás (z = -1.0f)
-	glColor3f(1.0f, 1.0f, 0.0f);     // Amarelo
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-
-	// Face esquerda (x = -1.0f)
-	glColor3f(0.0f, 0.0f, 1.0f);     // Azul
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-
-	// Face direita (x = 1.0f)
-	glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glEnd();
-
-	// Renderiza uma pirâmide com 4 triângulos
-	glLoadIdentity();                  // Reseta a matriz de modelview
-	glTranslatef(-1.5f, 0.0f, -6.0f);  // Move para a esquerda na tela o que será desenhado
-
-	glBegin(GL_TRIANGLES);           // Começa a desenhar a pirâmide com  4 triângulos
-	   // Frente
-	glColor3f(1.0f, 0.0f, 0.0f);     // Vermelho
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glColor3f(0.0f, 1.0f, 0.0f);     // Verde
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);     // Azul
-	glVertex3f(1.0f, -1.0f, 1.0f);
-
-	// Direita
-	glColor3f(1.0f, 0.0f, 0.0f);     // Vermelho
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);     // Azul
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glColor3f(0.0f, 1.0f, 0.0f);     // Verde
-	glVertex3f(1.0f, -1.0f, -1.0f);
-
-	// Trás
-	glColor3f(1.0f, 0.0f, 0.0f);    // Vermelho
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glColor3f(0.0f, 1.0f, 0.0f);     // Verde
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);     // Azul
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-
-	// Esquerda
-	glColor3f(1.0f, 0.0f, 0.0f);       // Vermelho
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);       // Azul
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glColor3f(0.0f, 1.0f, 0.0f);       // Verde
-	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glBegin(GL_LINES);                // Começa a desenhar o cubo
+	for (int i = 0; i < poligono.numLados; i++) {
+		glVertex3f(poligono.vertices[poligono.arestas[i].first].x, poligono.vertices[poligono.arestas[i].first].y, poligono.vertices[poligono.arestas[i].first].z);
+		glVertex3f(poligono.vertices[poligono.arestas[i].second].x, poligono.vertices[poligono.arestas[i].second].y, poligono.vertices[poligono.arestas[i].second].z);
+		
+		std::cout << poligono.arestas[i].first << " : "<< poligono.vertices[poligono.arestas[i].first].x <<" , " << poligono.vertices[poligono.arestas[i].first].y << " , " << poligono.vertices[poligono.arestas[i].first].z
+			<< "|" <<
+			poligono.arestas[i].second << " : " << poligono.vertices[poligono.arestas[i].second].x << " , " << poligono.vertices[poligono.arestas[i].second].y << " , " << poligono.vertices[poligono.arestas[i].second].z << "\n";
+	}
 	glEnd();
 
 	glutSwapBuffers();  // Double Buffer, troca o atual pelo que está aguardando
