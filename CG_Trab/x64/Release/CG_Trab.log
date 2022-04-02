@@ -1,0 +1,10 @@
+﻿  CG_Trab.cpp
+C:\Users\lucas\Source\Repos\CG_Trab\CG_Trab\CG_Trab.cpp(145,21): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\lucas\Source\Repos\CG_Trab\CG_Trab\CG_Trab.cpp(147,16): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+  Gerando código
+  3 of 176 functions ( 1.7%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finalizada a geração de código
+  CG_Trab.vcxproj -> C:\Users\lucas\Source\Repos\CG_Trab\x64\Release\CG_Trab.exe
+          1 arquivo(s) copiado(s).
