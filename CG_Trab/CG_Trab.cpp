@@ -80,8 +80,11 @@ void keyboard(unsigned char key, int x, int y) {
 	case 27:
 		exit(0);
 		break;
-	case ' ':
+	case 'j':
 		escalar(cubo, 1.5, 1.5, 1.5);
+		break;
+	case 'k':
+		escalar(cubo, 0.5, 0.5, 0.5);
 		break;
 	}
 }
@@ -114,7 +117,6 @@ void redraw(int value) {
 	//rotacionar(pentagono, 0.05);
 	glutTimerFunc(delay, redraw, 0);
 }
-
 
 void idle() {
 
@@ -263,7 +265,7 @@ void desenhar(Poligono poligono) {
 	glRotatef(30, 1, 1, 0);//Só para teste
 	//std::cout << "\nDesenhar Ativado\n";
 
-	glBegin(GL_QUADS);                // Começa a desenhar o cubo
+	glBegin(GL_LINES);                // Começa a desenhar o cubo
 	for (int i = 0; i < poligono.numLados; i++) {
 		glVertex3f(poligono.vertices[poligono.arestas[i].first].x, poligono.vertices[poligono.arestas[i].first].y, poligono.vertices[poligono.arestas[i].first].z);
 		glVertex3f(poligono.vertices[poligono.arestas[i].second].x, poligono.vertices[poligono.arestas[i].second].y, poligono.vertices[poligono.arestas[i].second].z);
