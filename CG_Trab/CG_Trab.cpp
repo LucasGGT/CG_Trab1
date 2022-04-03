@@ -22,7 +22,7 @@ struct Poligono {
 
 Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados);
 void desenhar(Poligono poligono);
-void movimentar(Poligono& poligono, double distancia, double angulo);
+void movimentar(Poligono& poligono, double distancia, double x, double y, double z);
 void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z);
 void rotacionar(Poligono& poligono, double angulo);
 
@@ -86,6 +86,25 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'k':
 		escalar(cubo, 0.5, 0.5, 0.5);
 		break;
+
+	case 'a':
+		movimentar(cubo, 1, -1, 0, 0);
+		break;
+	case 'w':
+		movimentar(cubo, 1, 0, 1, 0);
+		break;
+	case 's':
+		movimentar(cubo, 1, 0, -1, 0);
+		break;
+	case 'd':
+		movimentar(cubo, 1, 1, 0, 0);
+		break;
+	case 'q':
+		movimentar(cubo, 1, 0, 0, 1);
+		break;
+	case 'e':
+		movimentar(cubo, 1, 0, 0, -1);
+		break;
 	}
 }
 
@@ -93,19 +112,19 @@ void keyboard_special(int key, int x, int y) {
 	std::cout << key;
 	switch (key) {
 	case GLUT_KEY_DOWN:
-		movimentar(cubo, 10, (270 / 180.0) * 3.1416);
+		movimentar(cubo, 1, 0, -1, 0);
 		break;
 
 	case GLUT_KEY_UP:
-		movimentar(cubo, 10, (90 / 180.0) * 3.1416);
+		movimentar(cubo, 1, 0, 1, 0);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		movimentar(cubo, 10, (0 / 180.0) * 3.1416);
+		movimentar(cubo, 1, 1, 0, 0);
 		break;
 
 	case GLUT_KEY_LEFT:
-		movimentar(cubo, 10, (180 / 180.0) * 3.1416);
+		movimentar(cubo, 1, -1, 0, 0);
 		break;
 
 	}
@@ -189,13 +208,20 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 	return novo_poligono;
 }
 
-void movimentar(Poligono& poligono, double distancia, double angulo) {
-	poligono.posicao.x = poligono.posicao.x + distancia * cos(angulo);
-	poligono.posicao.y = poligono.posicao.y + distancia * sin(angulo);
+void movimentar(Poligono& poligono, double distancia, double x, double y, double z) {
+	//poligono.posicao.x = poligono.posicao.x + distancia * cos(angulo);
+	//poligono.posicao.y = poligono.posicao.y + distancia * sin(angulo);
 	for (int i = 0; i < poligono.vertices.size(); i++) {
-		poligono.vertices[i].x = poligono.vertices[i].x + distancia * cos(angulo);
-		poligono.vertices[i].y = poligono.vertices[i].y + distancia * sin(angulo);
+		poligono.vertices[i].x = poligono.vertices[i].x + (distancia * x);
+		poligono.vertices[i].y = poligono.vertices[i].y + (distancia * y);
+		poligono.vertices[i].z = poligono.vertices[i].z + (distancia * z);
 	}
+
+	std::cout << "Vertices:\n";
+	for (int i = 0; i < poligono.vertices.size(); i++) {
+		std::cout << i << "-| " << poligono.vertices[i].x << " | " << poligono.vertices[i].y << " | " << poligono.vertices[i].z << "\n";
+	}
+
 }
 
 void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z) {
