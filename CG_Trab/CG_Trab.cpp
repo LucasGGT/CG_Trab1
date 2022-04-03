@@ -24,7 +24,7 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 void desenhar(Poligono poligono);
 void movimentar(Poligono& poligono, double distancia, double x, double y, double z);
 void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z);
-void rotacionar(Poligono& poligono, double angulo);
+void rotacionar(Poligono& poligono, double angulo, double x, double y, double z);
 
 void display();
 void idle();
@@ -112,19 +112,19 @@ void keyboard_special(int key, int x, int y) {
 	std::cout << key;
 	switch (key) {
 	case GLUT_KEY_DOWN:
-		movimentar(cubo, 1, 0, -1, 0);
+		rotacionar(cubo, 5, 1, 0, 0);
 		break;
 
 	case GLUT_KEY_UP:
-		movimentar(cubo, 1, 0, 1, 0);
+		rotacionar(cubo, -5, 1, 0, 0);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		movimentar(cubo, 1, 1, 0, 0);
+		rotacionar(cubo, 5, 1, 0, 0);
 		break;
 
 	case GLUT_KEY_LEFT:
-		movimentar(cubo, 1, -1, 0, 0);
+		rotacionar(cubo, 5, 1, 0, 0);
 		break;
 
 	}
@@ -167,16 +167,16 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 	float zoom = 20.0f;
 	// Vertices
 	// Face da frente  (z = 1.0f)
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, 1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -7.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -7.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -7.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -7.0f));
 
 	// Face de trás (z = -1.0f)
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -9.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -9.0f));
+	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -9.0f));
+	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -9.0f));
 
 	// Arestas
 	novo_poligono.arestas.push_back(aresta(0, 1));
@@ -249,34 +249,53 @@ void escalar(Poligono& poligono, double escala_x, double escala_y, double escala
 
 }
 
-void rotacionar(Poligono& poligono, double angulo) {
+void rotacionar(Poligono& poligono, double angulo, double x, double y, double z) {
 	poligono.rotacao += angulo;
 
+	/*
 	poligono.matriz_rotacao[0][0] = cos(angulo);
 	poligono.matriz_rotacao[0][1] = -sin(angulo);
 	poligono.matriz_rotacao[1][0] = sin(angulo);
 	poligono.matriz_rotacao[1][1] = cos(angulo);
+	*/
 
-	vertice pivo = poligono.posicao;
+	//vertice pivo = poligono.posicao;
 
 	for (int i = 0; i < poligono.vertices.size(); i++) {
+		/*
 		poligono.vertices[i].x = poligono.vertices[i].x - pivo.x;
 		poligono.vertices[i].y = poligono.vertices[i].y - pivo.y;
+		*/
 
-		double matriz[2][2];
+		if (x == 1) {
+			double aux =			 cos(angulo) * poligono.vertices[i].y - sin(angulo) * poligono.vertices[i].z;
+			poligono.vertices[i].z = sin(angulo) * poligono.vertices[i].y + cos(angulo) * poligono.vertices[i].z;
+			poligono.vertices[i].y = aux;
+		}
 
-		matriz[0][0] = cos(angulo);
-		matriz[0][1] = -sin(angulo);
-		matriz[1][0] = sin(angulo);
-		matriz[1][1] = cos(angulo);
+		if (y == 1) {
+			double aux =			 cos(angulo) * poligono.vertices[i].x + sin(angulo) * poligono.vertices[i].z;
+			poligono.vertices[i].z = - sin(angulo) * poligono.vertices[i].x + cos(angulo) * poligono.vertices[i].z;
+			poligono.vertices[i].x = aux;
+		}
 
-		double aux = poligono.vertices[i].x * matriz[0][0] + poligono.vertices[i].y * matriz[0][1];
-		poligono.vertices[i].y = poligono.vertices[i].x * matriz[1][0] + poligono.vertices[i].y * matriz[1][1];
-		poligono.vertices[i].x = aux;
+		if (z == 1) {
+			double aux =			 cos(angulo) * poligono.vertices[i].x - sin(angulo) * poligono.vertices[i].z;
+			poligono.vertices[i].z = sin(angulo) * poligono.vertices[i].x + cos(angulo) * poligono.vertices[i].z;
+			poligono.vertices[i].x = aux;
+		}
 
+		/*
 		poligono.vertices[i].x = poligono.vertices[i].x + pivo.x;
 		poligono.vertices[i].y = poligono.vertices[i].y + pivo.y;
+		*/
 	}
+
+	std::cout << "Vertices:\n";
+	for (int i = 0; i < poligono.vertices.size(); i++) {
+		std::cout << i << "-| " << poligono.vertices[i].x << " | " << poligono.vertices[i].y << " | " << poligono.vertices[i].z << "\n";
+	}
+
 
 }
 
@@ -286,8 +305,8 @@ void desenhar(Poligono poligono) {
 
 	// Renderiza um cubo com 6 quads diferentes
 	glLoadIdentity();                 // Reseta para a matriz identidade
-	glTranslatef(0.0f, 0.0f, -10.0);  // Move para a direta da view o que será desenhado
 
+	glTranslatef(0.0f, 0.0f, -10.0);
 	glRotatef(30, 1, 1, 0);//Só para teste
 	//std::cout << "\nDesenhar Ativado\n";
 
