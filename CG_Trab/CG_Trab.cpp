@@ -38,7 +38,7 @@ int delay = 10;
 
 int main(int argc, char** argv) {
 
-	cubo = criar_cubo(128, 128, 5, 1.0f, 12);
+	cubo = criar_cubo(128, 128, 5, 2.0f, 12);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE); // Double buffer
@@ -81,7 +81,7 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0);
 		break;
 	case ' ':
-		escalar(cubo, 0.1, 0.1, 0.1);
+		escalar(cubo, 1.5, 1.5, 1.5);
 		break;
 	}
 }
@@ -143,6 +143,7 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 
 	novo_poligono.rotacao = 0;
 
+	float zoom = 20.0f;
 	// Vertices
 	// Face da frente  (z = 1.0f)
 	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
@@ -200,18 +201,24 @@ void escalar(Poligono& poligono, double escala_x, double escala_y, double escala
 	poligono.escala.y = escala_y;
 	poligono.escala.z = escala_z;
 	for (int i = 0; i < poligono.vertices.size(); i++) {
-		poligono.vertices[i].x = poligono.vertices[i].x - poligono.posicao.x;
-		poligono.vertices[i].y = poligono.vertices[i].y - poligono.posicao.y;
-		poligono.vertices[i].z = poligono.vertices[i].z - poligono.posicao.z;
+		//poligono.vertices[i].x = poligono.vertices[i].x -poligono.posicao.x;
+		//poligono.vertices[i].y = poligono.vertices[i].y -poligono.posicao.y;
+		//poligono.vertices[i].z = poligono.vertices[i].z - poligono.posicao.z;
 
 		poligono.vertices[i].x = poligono.vertices[i].x * escala_x;
 		poligono.vertices[i].y = poligono.vertices[i].y * escala_y;
 		poligono.vertices[i].z = poligono.vertices[i].z * escala_z;
 
-		poligono.vertices[i].x = poligono.vertices[i].x + poligono.posicao.x;
-		poligono.vertices[i].y = poligono.vertices[i].y + poligono.posicao.y;
-		poligono.vertices[i].z = poligono.vertices[i].z + poligono.posicao.z;
+		//poligono.vertices[i].x = poligono.vertices[i].x + poligono.posicao.x;
+		//poligono.vertices[i].y = poligono.vertices[i].y + poligono.posicao.y;
+		//poligono.vertices[i].z = poligono.vertices[i].z + poligono.posicao.z;
 	}
+
+	std::cout << "Vertices:\n";
+	for (int i = 0; i < poligono.vertices.size(); i++) {
+		std::cout << i << "-| " << poligono.vertices[i].x << " | " << poligono.vertices[i].y << " | " << poligono.vertices[i].z << "\n";
+	}
+
 }
 
 void rotacionar(Poligono& poligono, double angulo) {
@@ -251,16 +258,16 @@ void desenhar(Poligono poligono) {
 
 	// Renderiza um cubo com 6 quads diferentes
 	glLoadIdentity();                 // Reseta para a matriz identidade
-	glTranslatef(0.0f, 0.0f, -20.0f);  // Move para a direta da view o que será desenhado
+	glTranslatef(0.0f, 0.0f, -10.0);  // Move para a direta da view o que será desenhado
 
 	glRotatef(30, 1, 1, 0);//Só para teste
 	//std::cout << "\nDesenhar Ativado\n";
 
-	glBegin(GL_LINES);                // Começa a desenhar o cubo
+	glBegin(GL_QUADS);                // Começa a desenhar o cubo
 	for (int i = 0; i < poligono.numLados; i++) {
 		glVertex3f(poligono.vertices[poligono.arestas[i].first].x, poligono.vertices[poligono.arestas[i].first].y, poligono.vertices[poligono.arestas[i].first].z);
 		glVertex3f(poligono.vertices[poligono.arestas[i].second].x, poligono.vertices[poligono.arestas[i].second].y, poligono.vertices[poligono.arestas[i].second].z);
-	
+		
 	}
 
 	glEnd();
@@ -277,5 +284,5 @@ void reshape(GLsizei width, GLsizei height) {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, aspect, 0.1f, 100.0f);
+	gluPerspective(45.0f, aspect, 0.1f, 1000.0f);
 }
