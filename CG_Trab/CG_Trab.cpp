@@ -1,8 +1,8 @@
 /*
-	Alunos:	
+	Alunos:
 			Daniel Akira Nakamura Gullich
 			Lucas Gabriel Grutka Telles
-			Eduardo Loback Stefani
+			Eduardo Oliveira
 
 	Comandos:
 			Esc - Sair
