@@ -14,7 +14,7 @@ struct Poligono {
 	int numLados;
 	vertice posicao;
 	vertice escala;
-	double rotacao;
+	double rotacao[3];
 	double matriz_rotacao[3][3];
 	std::vector<vertice> vertices;
 	std::vector<aresta> arestas;
@@ -124,7 +124,7 @@ void keyboard_special(int key, int x, int y) {
 		break;
 
 	case GLUT_KEY_LEFT:
-		rotacionar(cubo, 5, 1, 0, 0);
+		rotacionar(cubo, -5, 0, 1, 0);
 		break;
 
 	}
@@ -153,16 +153,18 @@ vertice criar_vertice(double pos_x, double pos_y, double pos_z) {
 Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados) {
 	Poligono novo_poligono;
 	novo_poligono.numLados = num_lados;
-	novo_poligono.posicao.x = posicao_x;
-	novo_poligono.posicao.y = posicao_y;
-	novo_poligono.posicao.z = posicao_z;
+	novo_poligono.posicao.x = 0.0f;
+	novo_poligono.posicao.y = 0.0f;
+	novo_poligono.posicao.z = -8.0f;
 	novo_poligono.tamanhoLado = tamanho_lado;
 
 	novo_poligono.escala.x = 1;
 	novo_poligono.escala.y = 1;
 	novo_poligono.escala.z = 1;
 
-	novo_poligono.rotacao = 0;
+	novo_poligono.rotacao[0] = 0;
+	novo_poligono.rotacao[1] = 0;
+	novo_poligono.rotacao[2] = 0;
 
 	float zoom = 20.0f;
 	// Vertices
@@ -229,8 +231,8 @@ void escalar(Poligono& poligono, double escala_x, double escala_y, double escala
 	poligono.escala.y = escala_y;
 	poligono.escala.z = escala_z;
 	for (int i = 0; i < poligono.vertices.size(); i++) {
-		//poligono.vertices[i].x = poligono.vertices[i].x -poligono.posicao.x;
-		//poligono.vertices[i].y = poligono.vertices[i].y -poligono.posicao.y;
+		//poligono.vertices[i].x = poligono.vertices[i].x - poligono.posicao.x;
+		//poligono.vertices[i].y = poligono.vertices[i].y - poligono.posicao.y;
 		//poligono.vertices[i].z = poligono.vertices[i].z - poligono.posicao.z;
 
 		poligono.vertices[i].x = poligono.vertices[i].x * escala_x;
@@ -250,27 +252,41 @@ void escalar(Poligono& poligono, double escala_x, double escala_y, double escala
 }
 
 void rotacionar(Poligono& poligono, double angulo, double x, double y, double z) {
-	poligono.rotacao += angulo;
 
 	/*
+	if (x == 1) {
+		poligono.rotacao[0] += angulo;
+	}
+
+	if (y == 1) {
+		poligono.rotacao[1] += angulo;
+	}
+
+	if (z == 1) {
+		poligono.rotacao[2] += angulo;
+	}
+
 	poligono.matriz_rotacao[0][0] = cos(angulo);
 	poligono.matriz_rotacao[0][1] = -sin(angulo);
 	poligono.matriz_rotacao[1][0] = sin(angulo);
 	poligono.matriz_rotacao[1][1] = cos(angulo);
 	*/
 
-	//vertice pivo = poligono.posicao;
+	vertice pivo = poligono.posicao;
 
 	for (int i = 0; i < poligono.vertices.size(); i++) {
-		/*
+		
 		poligono.vertices[i].x = poligono.vertices[i].x - pivo.x;
 		poligono.vertices[i].y = poligono.vertices[i].y - pivo.y;
-		*/
+		poligono.vertices[i].z = poligono.vertices[i].z - pivo.z;
+		
 
 		if (x == 1) {
+			std::cout << "\n antes 1: " << poligono.vertices[i].z << "\n";
 			double aux =			 cos(angulo) * poligono.vertices[i].y - sin(angulo) * poligono.vertices[i].z;
 			poligono.vertices[i].z = sin(angulo) * poligono.vertices[i].y + cos(angulo) * poligono.vertices[i].z;
 			poligono.vertices[i].y = aux;
+			std::cout << "\n Depois 1: " << poligono.vertices[i].z << "\n";
 		}
 
 		if (y == 1) {
@@ -285,10 +301,10 @@ void rotacionar(Poligono& poligono, double angulo, double x, double y, double z)
 			poligono.vertices[i].x = aux;
 		}
 
-		/*
 		poligono.vertices[i].x = poligono.vertices[i].x + pivo.x;
 		poligono.vertices[i].y = poligono.vertices[i].y + pivo.y;
-		*/
+		poligono.vertices[i].z = poligono.vertices[i].z + pivo.z;
+
 	}
 
 	std::cout << "Vertices:\n";
