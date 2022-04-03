@@ -1,3 +1,16 @@
+/*
+	Alunos:	
+			Daniel Akira Nakamura Gullich
+			Lucas Gabriel Grutka Telles
+			Eduardo Loback Stefani
+
+	Comandos:
+			Esc - Sair
+			WASD QE - Movimentar (Translação)
+			IJKL UO - Rotacionar
+			VB		- Escalar
+*/
+
 #include <iostream>
 #include <GL/freeglut.h>
 #include <vector>
@@ -18,25 +31,30 @@ struct Poligono {
 	std::vector<aresta> arestas;
 };
 
-Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados);
+Poligono criar_cubo();
 void desenhar(Poligono poligono);
 void movimentar(Poligono& poligono, double distancia, double x, double y, double z);
 void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z);
 void rotacionar(Poligono& poligono, double angulo, double x, double y, double z);
 
 void display();
-void idle();
 void redraw(int value);
 void keyboard(unsigned char key, int x, int y);
-void keyboard_special(int key, int x, int y);
 void reshape(GLsizei width, GLsizei height);
 
 Poligono cubo;
 int delay = 10;
 
+static double cor[12][3] =
+{
+		{1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
+		{0.5f,1.0f,0.5f},{0.5f,1.0f,0.75f},{0.5f,1.0f,1.0f},{0.5f,0.75f,1.0f},
+		{0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
+};
+
 int main(int argc, char** argv) {
 
-	cubo = criar_cubo(128, 128, 5, 2.0f, 12);
+	cubo = criar_cubo();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE); // Double buffer
@@ -47,7 +65,6 @@ int main(int argc, char** argv) {
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(keyboard_special);
 
 	glutReshapeFunc(reshape);
 	glutTimerFunc(10, redraw, 0);
@@ -63,7 +80,6 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
-
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -74,57 +90,59 @@ void display(void) {
 
 void keyboard(unsigned char key, int x, int y) {
 	std::cout << key;
+	// Sair
 	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	case 'j':
-		escalar(cubo, 1.5, 1.5, 1.5);
-		break;
-	case 'k':
-		escalar(cubo, 0.5, 0.5, 0.5);
-		break;
+		case 27:
+			exit(0);
+			break;
 
-	case 'a':
-		movimentar(cubo, 1, -1, 0, 0);
-		break;
-	case 'w':
-		movimentar(cubo, 1, 0, 1, 0);
-		break;
-	case 's':
-		movimentar(cubo, 1, 0, -1, 0);
-		break;
-	case 'd':
-		movimentar(cubo, 1, 1, 0, 0);
-		break;
-	case 'q':
-		movimentar(cubo, 1, 0, 0, 1);
-		break;
-	case 'e':
-		movimentar(cubo, 1, 0, 0, -1);
-		break;
-	}
-}
+	// Escala
+		case 'v':
+			escalar(cubo, 1.25, 1.25, 1.25);
+			break;
+		case 'b':
+			escalar(cubo, 0.75, 0.75, 0.75);
+			break;
+	
+	// Movimento
+		case 'a':
+			movimentar(cubo, 1, -1, 0, 0);
+			break;
+		case 'w':
+			movimentar(cubo, 1, 0, 1, 0);
+			break;
+		case 's':
+			movimentar(cubo, 1, 0, -1, 0);
+			break;
+		case 'd':
+			movimentar(cubo, 1, 1, 0, 0);
+			break;
+		case 'q':
+			movimentar(cubo, 1, 0, 0, 1);
+			break;
+		case 'e':
+			movimentar(cubo, 1, 0, 0, -1);
+			break;
 
-void keyboard_special(int key, int x, int y) {
-	std::cout << key;
-	switch (key) {
-	case GLUT_KEY_DOWN:
-		rotacionar(cubo, 0.1, 1, 0, 0);
-		break;
-
-	case GLUT_KEY_UP:
-		rotacionar(cubo, -0.1, 1, 0, 0);
-		break;
-
-	case GLUT_KEY_RIGHT:
-		rotacionar(cubo, 0.1, 0, 0, 1);
-		break;
-
-	case GLUT_KEY_LEFT:
-		rotacionar(cubo, -0.1, 0, 0, 1);
-		break;
-
+	// Rotação
+		case 'i':
+			rotacionar(cubo, -0.1, 1, 0, 0);
+			break;
+		case 'k':
+			rotacionar(cubo, 0.1, 1, 0, 0);
+			break;
+		case 'j':
+			rotacionar(cubo, -0.1, 0, 1, 0);
+			break;
+		case 'l':
+			rotacionar(cubo, 0.1, 0, 1, 0);
+			break;
+		case 'u':
+			rotacionar(cubo, -0.1, 0, 0, 1);
+			break;
+		case 'o':
+			rotacionar(cubo, 0.1, 0, 0, 1);
+			break;
 	}
 }
 
@@ -143,13 +161,12 @@ vertice criar_vertice(double pos_x, double pos_y, double pos_z) {
 	return novo_v;
 }
 
-Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double tamanho_lado, int num_lados) {
+Poligono criar_cubo() {
 	Poligono novo_poligono;
-	novo_poligono.numLados = num_lados;
+	novo_poligono.numLados = 12;
 	novo_poligono.posicao.x = 0.0f;
 	novo_poligono.posicao.y = 0.0f;
 	novo_poligono.posicao.z = -8.0f;
-	novo_poligono.tamanhoLado = tamanho_lado;
 
 	novo_poligono.escala.x = 1;
 	novo_poligono.escala.y = 1;
@@ -159,7 +176,6 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 	novo_poligono.rotacao[1] = 0;
 	novo_poligono.rotacao[2] = 0;
 
-	float zoom = 20.0f;
 	// Vertices
 	// Face da frente  (z = 1.0f)
 	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -7.0f));
@@ -196,7 +212,7 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 	}
 
 	std::cout << "Arestas:\n";
-	for (int i = 0; i < num_lados; i++) {
+	for (int i = 0; i < novo_poligono.numLados; i++) {
 		std::cout << novo_poligono.arestas[i].first << " - " << novo_poligono.arestas[i].second << "\n";
 	}
 
@@ -311,11 +327,12 @@ void desenhar(Poligono poligono) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpa o buffer de cor e o de profundidade
 	glMatrixMode(GL_MODELVIEW);     //Operar na matriz de ModelView
 
-	// Renderiza um cubo com 6 quads diferentes
+	// Renderiza um cubo
 	glLoadIdentity();                 // Reseta para a matriz identidade
-
+	glLineWidth(4.0);
 	glBegin(GL_LINES);                // Começa a desenhar o cubo
 	for (int i = 0; i < poligono.numLados; i++) {
+		glColor3f(cor[i][0], cor[i][1], cor[i][2]);
 		glVertex3f(poligono.vertices[poligono.arestas[i].first].x, poligono.vertices[poligono.arestas[i].first].y, poligono.vertices[poligono.arestas[i].first].z);
 		glVertex3f(poligono.vertices[poligono.arestas[i].second].x, poligono.vertices[poligono.arestas[i].second].y, poligono.vertices[poligono.arestas[i].second].z);
 		
