@@ -38,7 +38,7 @@ int delay = 10;
 
 int main(int argc, char** argv) {
 
-	cubo = criar_cubo(128, 128, 5, 50, 24);
+	cubo = criar_cubo(128, 128, 5, 1.0f, 12);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE); // Double buffer
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 	glutSpecialFunc(keyboard_special);
 
 	glutReshapeFunc(reshape);
-	//glutTimerFunc(10, redraw, 0);
+	glutTimerFunc(10, redraw, 0);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Coloca a cor de background para preto e opaco
 	glClearDepth(1.0f);                   // Define o buffer de profundidade para o mais distante possível
@@ -110,7 +110,6 @@ void keyboard_special(int key, int x, int y) {
 
 void redraw(int value) {
 
-
 	glutPostRedisplay();
 	//rotacionar(pentagono, 0.05);
 	glutTimerFunc(delay, redraw, 0);
@@ -143,20 +142,8 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 	novo_poligono.escala.z = 1;
 
 	novo_poligono.rotacao = 0;
-	
 
-	// Face de cima (y = 1.0f)
-	// Define os vértice em ordem anti-horário com a face apontando para cima
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
-	// Face de cima (y = -1.0f)
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -1.0f));
-
+	// Vertices
 	// Face da frente  (z = 1.0f)
 	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
 	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
@@ -169,17 +156,22 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
 	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
 
-	// Face esquerda (x = -1.0f)
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, 1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(-1.0f, -1.0f, 1.0f));
+	// Arestas
+	novo_poligono.arestas.push_back(aresta(0, 1));
+	novo_poligono.arestas.push_back(aresta(1, 2));
+	novo_poligono.arestas.push_back(aresta(2, 3));
+	novo_poligono.arestas.push_back(aresta(3, 0));
 
-	// Face direita (x = 1.0f)
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, -1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, 1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, 1.0f));
-	novo_poligono.vertices.push_back(criar_vertice(1.0f, -1.0f, -1.0f));
+	novo_poligono.arestas.push_back(aresta(7, 6));
+	novo_poligono.arestas.push_back(aresta(6, 5));
+	novo_poligono.arestas.push_back(aresta(5, 4));
+	novo_poligono.arestas.push_back(aresta(4, 7));
+
+	novo_poligono.arestas.push_back(aresta(0, 7));
+	novo_poligono.arestas.push_back(aresta(1, 6));
+	novo_poligono.arestas.push_back(aresta(2, 5));
+	novo_poligono.arestas.push_back(aresta(3, 4));
+
 
 	std::cout << "Vertices:\n";
 	for (int i = 0; i < novo_poligono.vertices.size() ; i++) {
@@ -188,8 +180,7 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 
 	std::cout << "Arestas:\n";
 	for (int i = 0; i < num_lados; i++) {
-		novo_poligono.arestas.push_back(aresta(i, (i + 1) % num_lados));
-		std::cout << i << " - " << (i + 1) % num_lados << "\n";
+		std::cout << novo_poligono.arestas[i].first << " - " << novo_poligono.arestas[i].second << "\n";
 	}
 
 	return novo_poligono;
@@ -260,20 +251,18 @@ void desenhar(Poligono poligono) {
 
 	// Renderiza um cubo com 6 quads diferentes
 	glLoadIdentity();                 // Reseta para a matriz identidade
-	glTranslatef(0.0f, 0.0f, -7.0f);  // Move para a direta da view o que será desenhado
+	glTranslatef(0.0f, 0.0f, -20.0f);  // Move para a direta da view o que será desenhado
 
 	glRotatef(30, 1, 1, 0);//Só para teste
-	std::cout << "\nTeste:\n";
+	//std::cout << "\nDesenhar Ativado\n";
 
 	glBegin(GL_LINES);                // Começa a desenhar o cubo
 	for (int i = 0; i < poligono.numLados; i++) {
 		glVertex3f(poligono.vertices[poligono.arestas[i].first].x, poligono.vertices[poligono.arestas[i].first].y, poligono.vertices[poligono.arestas[i].first].z);
 		glVertex3f(poligono.vertices[poligono.arestas[i].second].x, poligono.vertices[poligono.arestas[i].second].y, poligono.vertices[poligono.arestas[i].second].z);
-		
-		std::cout << poligono.arestas[i].first << " : "<< poligono.vertices[poligono.arestas[i].first].x <<" , " << poligono.vertices[poligono.arestas[i].first].y << " , " << poligono.vertices[poligono.arestas[i].first].z
-			<< "|" <<
-			poligono.arestas[i].second << " : " << poligono.vertices[poligono.arestas[i].second].x << " , " << poligono.vertices[poligono.arestas[i].second].y << " , " << poligono.vertices[poligono.arestas[i].second].z << "\n";
+	
 	}
+
 	glEnd();
 
 	glutSwapBuffers();  // Double Buffer, troca o atual pelo que está aguardando
