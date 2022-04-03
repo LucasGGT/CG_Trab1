@@ -1,8 +1,6 @@
 #include <iostream>
 #include <GL/freeglut.h>
 #include <vector>
-//using vertice = std::pair<double, double>;
-//using lista_vertices = std::vector<vertice>;
 using aresta = std::pair<int, int>;
 
 struct vertice {
@@ -112,19 +110,19 @@ void keyboard_special(int key, int x, int y) {
 	std::cout << key;
 	switch (key) {
 	case GLUT_KEY_DOWN:
-		rotacionar(cubo, 5, 1, 0, 0);
+		rotacionar(cubo, 0.1, 1, 0, 0);
 		break;
 
 	case GLUT_KEY_UP:
-		rotacionar(cubo, -5, 1, 0, 0);
+		rotacionar(cubo, -0.1, 1, 0, 0);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		rotacionar(cubo, 5, 1, 0, 0);
+		rotacionar(cubo, 0.1, 0, 0, 1);
 		break;
 
 	case GLUT_KEY_LEFT:
-		rotacionar(cubo, -5, 0, 1, 0);
+		rotacionar(cubo, -0.1, 0, 0, 1);
 		break;
 
 	}
@@ -133,12 +131,7 @@ void keyboard_special(int key, int x, int y) {
 void redraw(int value) {
 
 	glutPostRedisplay();
-	//rotacionar(pentagono, 0.05);
 	glutTimerFunc(delay, redraw, 0);
-}
-
-void idle() {
-
 }
 
 vertice criar_vertice(double pos_x, double pos_y, double pos_z) {
@@ -211,8 +204,10 @@ Poligono criar_cubo(double posicao_x, double posicao_y, double posicao_z, double
 }
 
 void movimentar(Poligono& poligono, double distancia, double x, double y, double z) {
-	//poligono.posicao.x = poligono.posicao.x + distancia * cos(angulo);
-	//poligono.posicao.y = poligono.posicao.y + distancia * sin(angulo);
+	poligono.posicao.x = poligono.posicao.x + (distancia * x);
+	poligono.posicao.y = poligono.posicao.y + (distancia * y);
+	poligono.posicao.z = poligono.posicao.z + (distancia * z);
+
 	for (int i = 0; i < poligono.vertices.size(); i++) {
 		poligono.vertices[i].x = poligono.vertices[i].x + (distancia * x);
 		poligono.vertices[i].y = poligono.vertices[i].y + (distancia * y);
@@ -265,7 +260,6 @@ void rotacionar(Poligono& poligono, double angulo, double x, double y, double z)
 	if (z == 1) {
 		poligono.rotacao[2] += angulo;
 	}
-
 	poligono.matriz_rotacao[0][0] = cos(angulo);
 	poligono.matriz_rotacao[0][1] = -sin(angulo);
 	poligono.matriz_rotacao[1][0] = sin(angulo);
@@ -282,11 +276,9 @@ void rotacionar(Poligono& poligono, double angulo, double x, double y, double z)
 		
 
 		if (x == 1) {
-			std::cout << "\n antes 1: " << poligono.vertices[i].z << "\n";
 			double aux =			 cos(angulo) * poligono.vertices[i].y - sin(angulo) * poligono.vertices[i].z;
 			poligono.vertices[i].z = sin(angulo) * poligono.vertices[i].y + cos(angulo) * poligono.vertices[i].z;
 			poligono.vertices[i].y = aux;
-			std::cout << "\n Depois 1: " << poligono.vertices[i].z << "\n";
 		}
 
 		if (y == 1) {
@@ -296,8 +288,8 @@ void rotacionar(Poligono& poligono, double angulo, double x, double y, double z)
 		}
 
 		if (z == 1) {
-			double aux =			 cos(angulo) * poligono.vertices[i].x - sin(angulo) * poligono.vertices[i].z;
-			poligono.vertices[i].z = sin(angulo) * poligono.vertices[i].x + cos(angulo) * poligono.vertices[i].z;
+			double aux =			 cos(angulo) * poligono.vertices[i].x - sin(angulo) * poligono.vertices[i].y;
+			poligono.vertices[i].y = sin(angulo) * poligono.vertices[i].x + cos(angulo) * poligono.vertices[i].y;
 			poligono.vertices[i].x = aux;
 		}
 
@@ -321,10 +313,6 @@ void desenhar(Poligono poligono) {
 
 	// Renderiza um cubo com 6 quads diferentes
 	glLoadIdentity();                 // Reseta para a matriz identidade
-
-	//glTranslatef(0.0f, 0.0f, -10.0);
-	//glRotatef(30, 1, 1, 0);//Só para teste
-	//std::cout << "\nDesenhar Ativado\n";
 
 	glBegin(GL_LINES);                // Começa a desenhar o cubo
 	for (int i = 0; i < poligono.numLados; i++) {
