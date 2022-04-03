@@ -231,17 +231,17 @@ void escalar(Poligono& poligono, double escala_x, double escala_y, double escala
 	poligono.escala.y = escala_y;
 	poligono.escala.z = escala_z;
 	for (int i = 0; i < poligono.vertices.size(); i++) {
-		//poligono.vertices[i].x = poligono.vertices[i].x - poligono.posicao.x;
-		//poligono.vertices[i].y = poligono.vertices[i].y - poligono.posicao.y;
-		//poligono.vertices[i].z = poligono.vertices[i].z - poligono.posicao.z;
+		poligono.vertices[i].x = poligono.vertices[i].x - poligono.posicao.x;
+		poligono.vertices[i].y = poligono.vertices[i].y - poligono.posicao.y;
+		poligono.vertices[i].z = poligono.vertices[i].z - poligono.posicao.z;
 
 		poligono.vertices[i].x = poligono.vertices[i].x * escala_x;
 		poligono.vertices[i].y = poligono.vertices[i].y * escala_y;
 		poligono.vertices[i].z = poligono.vertices[i].z * escala_z;
 
-		//poligono.vertices[i].x = poligono.vertices[i].x + poligono.posicao.x;
-		//poligono.vertices[i].y = poligono.vertices[i].y + poligono.posicao.y;
-		//poligono.vertices[i].z = poligono.vertices[i].z + poligono.posicao.z;
+		poligono.vertices[i].x = poligono.vertices[i].x + poligono.posicao.x;
+		poligono.vertices[i].y = poligono.vertices[i].y + poligono.posicao.y;
+		poligono.vertices[i].z = poligono.vertices[i].z + poligono.posicao.z;
 	}
 
 	std::cout << "Vertices:\n";
@@ -322,8 +322,8 @@ void desenhar(Poligono poligono) {
 	// Renderiza um cubo com 6 quads diferentes
 	glLoadIdentity();                 // Reseta para a matriz identidade
 
-	glTranslatef(0.0f, 0.0f, -10.0);
-	glRotatef(30, 1, 1, 0);//Só para teste
+	//glTranslatef(0.0f, 0.0f, -10.0);
+	//glRotatef(30, 1, 1, 0);//Só para teste
 	//std::cout << "\nDesenhar Ativado\n";
 
 	glBegin(GL_LINES);                // Começa a desenhar o cubo
